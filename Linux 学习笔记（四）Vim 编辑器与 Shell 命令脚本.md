@@ -75,6 +75,10 @@
 
 
 
+### 配置主机名称
+
+
+
 
 
 ## Vim 编写简单文档
@@ -101,4 +105,21 @@ vim practice.txt
 ![2](Linux_4_pic/2.png)
 
 * 下面就可以尽情地写文本了。
+* 第一次我们在空白文档内输入 "You can write in it."，然后按 Esc 键回到命令模式，输入 ":wq!" 强制保存退出。
+  * 最后在命令行使用 cat 语句查看文本内容：
 
+![3](Linux_4_pic/3.png)
+
+![4](Linux_4_pic/4.png)
+
+* 接下来在原文档后面追加 "This Sentence don't need to save"，然后按 Esc 键回到命令模式，输入 ":q" 不保存退出。
+  * 系统会先询问是否覆写，所以必须加 ! 来强制退出。
+  * 最后在命令行使用 cat 语句查看文本内容，发现内容没有修改：
+
+![5](Linux_4_pic/5.png)
+
+![6](Linux_4_pic/6.png)
+
+![7](Linux_4_pic/7.png)
+
+* 这就是简单的 vim 命令的使用。
