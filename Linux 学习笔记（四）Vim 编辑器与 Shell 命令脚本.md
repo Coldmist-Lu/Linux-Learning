@@ -77,6 +77,126 @@
 
 ### 配置主机名称
 
+* 为便于在局域网中查找特定的主机，或对主机进行区分，除要有 IP 地址外，还要为主机配置一个主机名，主机之间通过这个类似于域名的名称来互相访问。
+* 在 Linux 系统中，主机名大多保存在 /etc/hostname 文件中，接下来将 /etc/hostname 文件的内容修改为 "linuxprobe.com":
+
+#### 步骤
+
+* 使用 Vim 编辑器修改 "/etc/hostname" 主机名称文件。
+* 把原始主机名称删除后追加 "linuxprobe"。
+  * 注意：Vim 修改主机名称文件后，要执行 :wq! 命令才能保存退出。
+* 保存并退出文档，使用 hostname 命令检查是否修改成功。
+
+#### 例子
+
+* 原来 hostname 为 linuxprobe.com，修改为 linuxprobe。
+
+```shell
+vim /etc/hostname
+# 进入编辑器，按i进入编辑，删除原名字（linuxprobe.com），增加linuxprobe，按Esc，输入:wq!退出
+hostname
+```
+
+![8](Linux_4_pic/8.png)
+
+
+
+### 配置网卡信息
+
+* 网卡 IP 地址配置是否正确是两台服务器是否可以相互通信的前提。在 Linux 系统中，一切都是文件，因此配置网络服务就是在编辑网卡配置文件。
+* 在早期 Linux 系统中，如 RHEL 5、RHEL 6 中，网卡配置文件的前缀为 eth，第 1 块网卡为 eth0，第 2 块网卡为 eth1；以此类推。
+* 而 RHEL 7 中，网卡配置文件的前缀以 ifcfg 开始，加上网卡名称共同组成了配置文件名，例如 ifcfg-eno16777736。
+* 本节任务是，将网卡设备配置为开机自启动，并且 IP 地址、子网、网关等信息由人工指定。
+
+#### 步骤
+
+* 切换到 /etc/sysconfig/network-scripts 目录中（存放网卡配置文件）；
+* 使用 Vim 编辑器修改网卡文件 ifcfg-eno16777736，逐项写入下面的配置参数，然后保存退出。
+  * 由于每台设备的硬件及架构是不一样的，因此请读者使用 ifconfig 命令自行确认各自网卡的默认名称。
+  * 需要写入的参数：
+  * 设备类型：TYPE=Ethernet
+  * 地址分配模式：BOOTPROTO=static
+  * 网卡名称：NAME=eno16777736
+  * 是否启动：ONBOOT=yes
+  * IP 地址：IPADDR=192.168.10.10
+  * 子网掩码：NETMASK=255.255.255.0
+  * 网关地址：GATEWAY=192.168.10.1
+  * DNS 地址：DNS1=192.168.10.1
+* 重启网络服务并测试网络是否连通。
+
+#### 例子
+
+* 下面展示了修改网卡的步骤。需要修改 BOOTPROTO、ONBOOT 参数，增添 IPADDR、NETMASK、GATEWAY、DNS1 四个参数。
+
+```shell
+cd /etc/sysconfig/network-scripts/
+ls
+vim ifcfg-eno16777728
+# 修改内容（见下图1）
+systemctl restart network
+ping 192.168.10.10
+^C # 终止ping
+```
+
+* ifcfg-eno16777728 文件编辑：
+
+![9](Linux_4_pic/9.png)
+
+* Command：
+
+![10](Linux_4_pic/10.png)
+
+
+
+### 配置 Yum 软件仓库
+
+* Yum 软件仓库的作用是为了进一步简化 RPM 管理软件的难度以及自动分析所需软件包以及依赖关系。
+* 具体存储以及设备挂载的操作要在第 6 章才会讲解，因此本章重心是学习 Vim 编辑器。
+
+#### 步骤
+
+* 进入到 /etc/yum.repos.d/ 目录中（该目录存放配置文件）。
+* 使用 Vim 编辑器创建一个名为 rhel7.repo 的新配置文件（文件名随意，但后缀名必须为 .repo），逐项写入下面的配置参数。（写加粗部分，不写后面的注释）：
+  * **[rhel-media]**：Yum 软件仓库唯一标识符，避免与其他仓库冲突。
+  * **name=linuxprobe**：Yum 软件仓库的名称描述，易于识别仓库用处。
+  * **baseurl=file:///media/cdrom**：提供的方式包括 FTP（ftp://..）、HTTP（http://..）、本地（file:///..）。
+  * **enabled=1**：设置此源是否可用；1为可用，0为禁用。
+  * **gpgcheck=1**：设置此源是否校验文件；1为校验，0为不校验。
+  * **gpgkey=file:///media/cdrom/RPM-GPG-KEY-redhat-release**：若上面参数开启校验，需要执行校验公钥文件地址。
+
+* 按配置参数的路径挂载光盘，并把光盘挂载信息写入到 /etc/fstab 文件中。
+* 使用 "yum install httpd -y" 命令检查 Yum 软件仓库是否已经可用。
+
+#### 例子
+
+* 下面展示 Yum 配置的例子：
+
+```shell
+cd /etc/yum.repos.d/
+vim rhel7.repo
+mkdir -p /media/cdrom
+mount /dev/cdrom /media/cdrom
+vim /etc/fstab
+yum install httpd
+# ... Complete!
+```
+
+* rhel7.repo 文件编辑：
+
+![12](Linux_4_pic/12.png)
+
+* /etc/fstab 文件编辑：
+
+![13](Linux_4_pic/13.png)
+
+* Command：
+
+![14](Linux_4_pic/14.png)
+
+
+
+## 编写 Shell 脚本
+
 
 
 
